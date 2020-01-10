@@ -1,0 +1,44 @@
+#version 330 core
+
+// Interpolated values from the vertex shaders
+in vec3 TexCoords;
+in vec2 UV;
+
+out vec4 color;
+// out vec3 color;
+
+float near = 0.1;
+float far = 100;
+
+uniform samplerCube cubemap;
+uniform sampler2D fire_texture; 
+uniform sampler2D disp_texture; 
+uniform sampler2D alpha_texture; 
+uniform float u_time;
+
+float LinearizeDepth(float depth) {
+    float z = depth * 2.0 - 1.0;
+    return (2.0 * near * far) / (far + near - z * (far - near));
+}
+
+void main() {
+
+    
+    // float depth = LinearizeDepth(gl_FragCoord.z) / far;
+    // color = vec3(depth);
+    // color = texture(cubemap, TexCoords);
+    
+    vec4 texColor = texture(fire_texture, UV);
+    if (texColor.a < 0.1)
+        discard;
+	color = texColor;
+    
+    //vec2 disp = texture(disp_texture, vec2(UV.x, UV.y + u_time)).rg;
+    //vec2 displacement = (2.0*disp - 1.0)*0.2;
+    //vec2 newuv = UV + displacement;
+    
+    //vec4 texture_color = texture(fire_texture, newuv);
+    //vec4 alphamask = texture(alpha_texture, UV);
+
+    //color = texture_color * vec4(1.0,1.0,1.0,alphamask.a);
+}

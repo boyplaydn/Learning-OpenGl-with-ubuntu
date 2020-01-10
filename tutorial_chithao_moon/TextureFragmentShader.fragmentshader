@@ -1,0 +1,35 @@
+#version 330 core
+
+// Interpolated values from the vertex shaders
+in vec2 UV;
+
+// Ouput data
+out vec4 color;
+
+// Values that stay constant for the whole mesh.
+uniform sampler2D TextureSampler1;
+uniform sampler2D TextureSampler2;
+uniform sampler2D TextureSampler3;
+uniform sampler2D TextureSampler4;
+uniform sampler2D BlendingTexture;
+
+
+void main(){
+
+	// Output color = color of the texture at the specified UV
+	vec3 grassColor = texture( TextureSampler1, UV ).rgb;
+	vec3 dirtColor = texture( TextureSampler2, UV ).rgb;
+	vec3 rockColor = texture( TextureSampler3, UV ).rgb;
+	vec3 colorbend = texture( BlendingTexture, UV ).rgb;
+	vec3 lightColor = vec3(1., 1., 1.);
+	vec3 objectColor = vec3(1.0, 0.5, 0.3);
+	float ambientStrenght = 0.1;
+	vec3 ambientLight = ambientStrenght*lightColor;
+	float dirtWeight = colorbend.r;
+	float grassWeight = colorbend.g;
+	float rockWeight = colorbend.b;
+	// color = grassWeight*grassColor + dirtWeight*dirtColor + rockWeight*rockColor;
+	// color = ambientLight*objectColor;
+	vec4 texColor = texture(TextureSampler4, UV);
+	color = texColor;
+}

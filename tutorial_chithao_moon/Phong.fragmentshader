@@ -1,0 +1,59 @@
+#version 330 core
+struct Light{
+	vec3 position;
+	vec3 color;
+};
+struct Material {
+	vec3 ambientColor;
+	vec3 diffuseColor;
+	vec3 specularColor;
+	float shininess;
+};
+// Interpolated values from the vertex shaders
+in vec2 UV;
+in vec3 vertexNormal_worldspace;
+in vec3 vertexPosition_worldspace;
+// uniform
+uniform vec3 lightPos_wordspace;
+uniform vec3 viewPos_worldspace;
+uniform Light light;
+uniform Material material;
+// Ouput data
+out vec3 color;
+void main(){
+	vec3 lightColor = vec3(1.0,1.0,1.0);
+	vec3 objectColor = vec3(1.0, 0.5, 0.31);
+	
+	vec3 norm = normalize(vertexNormal_worldspace);
+	// calculate the light direction 
+	vec3 lightDirection = normalize(light.position - vertexPosition_worldspace);
+	// calculate view direction
+	vec3 viewDir = normalize(viewPos_worldspace - vertexPosition_worldspace);
+	// calculate the ambient
+	float ambientStrength = 0.1;
+	vec3 ambientLight = ambientStrength * light.color;
+	
+	// calculate the diffuse
+	float diffuse = max(dot(norm, lightDirection), 0.0);
+	vec3 diffuseLight = diffuse * light.color;
+	
+	// calculate the scpecular
+	float specularStrength = 0.5;
+	vec3 reflectDir = reflect(-lightDirection, norm); 
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+	vec3 specularLight = specularStrength * spec * light.color;
+
+	// calculate the Material ambient
+	vec3 ambientM = lightColor * material.ambientColor;
+
+	// calculate the Material diffuse
+	vec3 diffuseM = lightColor * (diffuse*material.diffuseColor);
+	// calculate the Material scpecular
+	vec3 scpecularM = lightColor * (spec*material.specularColor);
+	
+	// color = (ambientLight+ diffuseLight+ specularLight) * objectColor;
+	color = ambientM + diffuseM + scpecularM;
+}
+
+
+
